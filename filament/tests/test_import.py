@@ -66,7 +66,7 @@ def test_imports_str_as_str():
 
 
 def test_recursively_imports_lists():
-    with patch("filament.from_json") as MockClass:
+    with patch("filament._import.from_json") as MockClass:
         MockClass.side_effect = FromJsonCall
         assert from_json([1, 2, 3], list[int]) == [
             FromJsonCall(1, int),
@@ -79,7 +79,7 @@ def test_recursively_imports_list_subclass():
     class TestList(list):
         pass
 
-    with patch("filament.from_json") as MockClass:
+    with patch("filament._import.from_json") as MockClass:
         MockClass.side_effect = FromJsonCall
         obj = from_json([1, 2, 3], TestList[int])
         assert isinstance(obj, TestList)
@@ -93,7 +93,7 @@ def test_recursively_imports_list_subclass():
 
 
 def test_recursively_imports_sets():
-    with patch("filament.from_json") as MockClass:
+    with patch("filament._import.from_json") as MockClass:
         MockClass.side_effect = FromJsonCall
         assert from_json([1, 2, 3], set[int]) == {
             FromJsonCall(1, int),
@@ -106,7 +106,7 @@ def test_recursively_imports_set_subclass():
     class TestSet(set):
         pass
 
-    with patch("filament.from_json") as MockClass:
+    with patch("filament._import.from_json") as MockClass:
         MockClass.side_effect = FromJsonCall
         obj = from_json([1, 2, 3], TestSet[int])
         assert isinstance(obj, TestSet)
@@ -120,7 +120,7 @@ def test_recursively_imports_set_subclass():
 
 
 def test_recursively_imports_dicts():
-    with patch("filament.from_json") as MockClass:
+    with patch("filament._import.from_json") as MockClass:
         MockClass.side_effect = FromJsonCall
         assert from_json({"a": 1, "b": 2, "c": 3}, dict[str, int]) == {
             FromJsonCall("a", str): FromJsonCall(1, int),
@@ -133,7 +133,7 @@ def test_recursively_imports_dict_subclass():
     class TestDict(dict):
         pass
 
-    with patch("filament.from_json") as MockClass:
+    with patch("filament._import.from_json") as MockClass:
         MockClass.side_effect = FromJsonCall
         obj = from_json({"a": 1, "b": 2, "c": 3}, TestDict[str, int])
         assert isinstance(obj, TestDict)
@@ -234,7 +234,7 @@ def test_imports_object_with_type_hints_from_dict():
             self.num = num
             self.text = text
 
-    with patch("filament.from_json") as MockClass:
+    with patch("filament._import.from_json") as MockClass:
         MockClass.side_effect = FromJsonCall
         obj = from_json({"num": 1, "text": "foobar"}, TestObject)
         assert isinstance(obj, TestObject)
@@ -251,7 +251,7 @@ def test_imports_object_with_annotated_type_hints_from_dict():
             self.num = num
             self.text = text
 
-    with patch("filament.from_json") as MockClass:
+    with patch("filament._import.from_json") as MockClass:
         MockClass.side_effect = FromJsonCall
         obj = from_json({"num": 1, "text": "foobar"}, TestObject)
         assert isinstance(obj, TestObject)
@@ -265,7 +265,7 @@ def test_imports_dataclass_instance_from_dict():
         num: int
         text: str
 
-    with patch("filament.from_json") as MockClass:
+    with patch("filament._import.from_json") as MockClass:
         MockClass.side_effect = FromJsonCall
         obj = from_json({"num": 1, "text": "foobar"}, TestObject)
         assert isinstance(obj, TestObject)
@@ -279,7 +279,7 @@ def test_imports_frozen_dataclass_instance_from_dict():
         num: int
         text: str
 
-    with patch("filament.from_json") as MockClass:
+    with patch("filament._import.from_json") as MockClass:
         MockClass.side_effect = FromJsonCall
         obj = from_json({"num": 1, "text": "foobar"}, TestObject)
         assert isinstance(obj, TestObject)

@@ -47,19 +47,19 @@ def test_exports_str_as_str():
 
 
 def test_recursively_exports_list_as_list():
-    with patch("filament.to_json") as MockClass:
+    with patch("filament._export.to_json") as MockClass:
         MockClass.side_effect = ToJsonCall
         assert to_json([1, 2, 3]) == [ToJsonCall(1), ToJsonCall(2), ToJsonCall(3)]
 
 
 def test_recursively_exports_set_as_list():
-    with patch("filament.to_json") as MockClass:
+    with patch("filament._export.to_json") as MockClass:
         MockClass.side_effect = ToJsonCall
         assert to_json({1, 2, 3}) == [ToJsonCall(1), ToJsonCall(2), ToJsonCall(3)]
 
 
 def test_recursively_exports_dict_as_dict():
-    with patch("filament.to_json") as MockClass:
+    with patch("filament._export.to_json") as MockClass:
         MockClass.side_effect = ToJsonCall
         assert to_json({"a": 1, "b": 2, "c": 3}) == {
             ToJsonCall("a"): ToJsonCall(1),
@@ -140,7 +140,7 @@ def test_exports_object_with_type_hints_as_dict():
         x: int
         y: int
 
-    with patch("filament.to_json") as MockClass:
+    with patch("filament._export.to_json") as MockClass:
         MockClass.side_effect = ToJsonCall
         obj = TestObject()
         obj.x = 1
@@ -153,7 +153,7 @@ def test_exports_object_with_annotated_type_hints_as_dict():
         x: Annotated[int, "foobar"]
         y: int
 
-    with patch("filament.to_json") as MockClass:
+    with patch("filament._export.to_json") as MockClass:
         MockClass.side_effect = ToJsonCall
         obj = TestObject()
         obj.x = 1
@@ -167,7 +167,7 @@ def test_exports_dataclass_instance_as_dict():
         x: int
         y: int
 
-    with patch("filament.to_json") as MockClass:
+    with patch("filament._export.to_json") as MockClass:
         MockClass.side_effect = ToJsonCall
         obj = TestObject(x=1, y=2)
         assert to_json(obj) == {"x": ToJsonCall(1), "y": ToJsonCall(2)}
