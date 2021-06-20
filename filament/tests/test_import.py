@@ -2,12 +2,12 @@ from dataclasses import dataclass
 from datetime import date, datetime, time
 from decimal import Decimal
 from enum import Enum
-from typing import Annotated, Any, Type
+from typing import Annotated, Any, Optional, Type, Union
 from unittest.mock import patch
 
 import pytest
 
-from filament import ImportTypeError, from_json
+from filament import ImportTypeError, NoneRequiredError, ValueRequiredError, from_json
 
 
 @dataclass(frozen=True)
@@ -18,6 +18,24 @@ class FromJsonCall:
 
 def test_imports_none_as_none():
     assert from_json(None, type(None)) is None
+
+
+def test_raises_exception_when_importing_none_on_non_optional_type():
+    with pytest.raises(ValueRequiredError):
+        from_json(None, int)
+
+
+def test_raises_exception_when_importing_value_on_none_type():
+    with pytest.raises(NoneRequiredError):
+        from_json(5, None)
+
+
+def test_imports_none_as_none_on_optional_type():
+    assert from_json(None, Optional[int]) is None
+
+
+def test_imports_value_as_value_on_optional_type():
+    assert from_json(5, Optional[int]) == 5
 
 
 def test_imports_int_as_int():
@@ -275,3 +293,16 @@ def test_raises_error_when_importing_an_unsupported_type():
 
     with pytest.raises(ImportTypeError):
         from_json({}, TestObject)
+
+
+def test_can_import_unions():
+    assert from_json(5, Union[int, str]) == 5
+    assert from_json("5", Union[int, str]) == 5
+    assert from_json("5.3", Union[int, float, str]) == 5.3
+    assert from_json("5.3", Union[int, str, float]) == "5.3"
+    assert from_json("foobar", Union[int, str]) == "foobar"
+
+
+def test_raises_error_when_no_union_type_matches():
+    with pytest.raises(ImportTypeError):
+        assert from_json("foobar", Union[int, datetime])
