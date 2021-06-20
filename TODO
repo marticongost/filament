@@ -1,3 +1,5 @@
+Support for Optional type hints
+Support for Union type hints
 missing keys when importing an object from a dictionary
 what happens if value and target_type don't match
 tests for use_custom_importer / exporter = False
