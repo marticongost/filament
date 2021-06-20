@@ -70,3 +70,21 @@ class NoneRequiredError(ValueError):
     def __init__(self, value: Any) -> None:
         super().__init__(f"Received {value}, expected None")
         self.value = value
+
+
+class UnknownClassTagError(ValueError):
+    """Exception raised when trying to import an instance of a
+    `~.tagged_class.TaggedClass` using a tag that matches none of the classes in the
+    hierarchy.
+    """
+
+    target_type: Type
+    tag: str
+
+    def __init__(self, target_type: Type, tag: str):
+        super().__init__(
+            f"{tag} is not a valid class tag for {target_type.__name__}; "
+            f"expected one of {', '.join(target_type.filament_tags.keys())}"
+        )
+        self.target_type = target_type
+        self.tag = tag

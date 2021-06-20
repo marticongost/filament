@@ -7,7 +7,14 @@ from unittest.mock import patch
 
 import pytest
 
-from filament import ImportTypeError, NoneRequiredError, ValueRequiredError, from_json
+from filament import (
+    ImportTypeError,
+    NoneRequiredError,
+    TaggedClass,
+    UnknownClassTagError,
+    ValueRequiredError,
+    from_json,
+)
 
 
 @dataclass(frozen=True)
@@ -306,3 +313,64 @@ def test_can_import_unions():
 def test_raises_error_when_no_union_type_matches():
     with pytest.raises(ImportTypeError):
         assert from_json("foobar", Union[int, datetime])
+
+
+def test_can_discriminate_tagged_classes():
+    @dataclass
+    class A(TaggedClass):
+        a: str
+
+    @dataclass
+    class B(A):
+        b: str
+
+    @dataclass
+    class C(A):
+        c: str
+
+    @dataclass
+    class D(B):
+        d: str
+
+    assert from_json({"class": "A", "a": "a"}, A) == A(a="a")
+    assert from_json({"class": "B", "a": "a", "b": "b"}, A) == B(a="a", b="b")
+    assert from_json({"class": "C", "a": "a", "c": "c"}, A) == C(a="a", c="c")
+    assert (
+        from_json(
+            {
+                "class": "D",
+                "a": "a",
+                "b": "b",
+                "d": "d",
+            },
+            A,
+        )
+        == D(a="a", b="b", d="d")
+    )
+
+
+def test_assumes_root_class_when_importing_tagged_classes_with_tag_missing():
+    @dataclass
+    class A(TaggedClass):
+        a: str
+
+    @dataclass
+    class B(A):
+        b: str
+
+    assert from_json({"a": "a"}, A) == A(a="a")
+    assert from_json({"a": "a", "b": "b"}, A) == A(a="a")
+    assert from_json({"a": "a", "b": "b"}, B) == B(a="a", b="b")
+
+
+def test_raises_exception_when_importing_tagged_class_with_unknown_tag():
+    @dataclass
+    class A(TaggedClass):
+        a: str
+
+    @dataclass
+    class B(A):
+        b: str
+
+    with pytest.raises(UnknownClassTagError):
+        from_json({"class": "C", "a": "a"}, A)

@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import pytest
 
-from filament import ExportTypeError, to_json
+from filament import ExportTypeError, TaggedClass, to_json
 
 
 @dataclass(frozen=True)
@@ -195,3 +195,64 @@ def test_raises_error_when_exporting_a_class():
 
     with pytest.raises(ExportTypeError):
         to_json(TestObject)
+
+
+def test_exports_tagged_classes():
+    @dataclass
+    class A(TaggedClass):
+        a: str
+
+    @dataclass
+    class B(A):
+        b: str
+
+    @dataclass
+    class C(A):
+        c: str
+
+    @dataclass
+    class D(B):
+        d: str
+
+    assert to_json(A(a="a")) == {"class": "A", "a": "a"}
+    assert to_json(B(a="a", b="b")) == {"class": "B", "a": "a", "b": "b"}
+    assert to_json(C(a="a", c="c")) == {"class": "C", "a": "a", "c": "c"}
+    assert to_json(D(a="a", b="b", d="d")) == {
+        "class": "D",
+        "a": "a",
+        "b": "b",
+        "d": "d",
+    }
+
+
+def test_tagged_classes_can_override_their_tag_name():
+    @dataclass
+    class A(TaggedClass):
+        a: str
+
+    @dataclass
+    class B(A, filament_tag="foobar"):
+        b: str
+
+    assert to_json(A(a="a")) == {"class": "A", "a": "a"}
+    assert to_json(B(a="a", b="b")) == {"class": "foobar", "a": "a", "b": "b"}
+
+
+def test_maintains_one_class_tag_mapping_per_class_hierarchy():
+    class A(TaggedClass):
+        pass
+
+    class B(A):
+        pass
+
+    class X(TaggedClass):
+        pass
+
+    class Y(X):
+        pass
+
+    assert B.filament_tags is A.filament_tags
+    assert A.filament_tags == {"A": A, "B": B}
+
+    assert X.filament_tags is Y.filament_tags
+    assert X.filament_tags == {"X": X, "Y": Y}

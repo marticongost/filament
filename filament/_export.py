@@ -7,6 +7,7 @@ from types import FunctionType
 from typing import Any, Collection, Mapping, Protocol, Type, TypeVar, get_type_hints
 
 from ._exceptions import ExportTypeError
+from ._taggedclass import TaggedClass
 from ._types import JSON
 
 T = TypeVar("T", bound=Type)
@@ -83,10 +84,14 @@ def to_json(value: Any, *, use_custom_exporter: bool = True) -> JSON:
     if not isinstance(value, FunctionType):
         annotations = get_type_hints(type(value))
         if annotations:
-            return {
+            data = {
                 field_name: to_json(getattr(value, field_name))
                 for field_name, __ in annotations.items()
+                if not field_name.startswith("filament_")
             }
+            if isinstance(value, TaggedClass):
+                data["class"] = value.filament_tag
+            return data
 
     raise ExportTypeError(value)
 

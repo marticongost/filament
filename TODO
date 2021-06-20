@@ -5,14 +5,6 @@ classes without a full constructor
     - try to support frozen dataclasses, not frozen dataclasses and regular classes with
       no builder constructor
 protected / private fields
-simpler solution for classes with multiple subclasses:
-    - TaggedClass mixin, __init_subclass__ to create a subclass registry
-    - Use class name by default as an identifier, optional class initialization parameter
-      to override it
-    - Annotated[T, class_tag(...)] to optionally customize the serialization
-        - Key name for the class tag ("class" by default)
-        - Whether to add the class tag or not (True by default on TaggledClass references)
-        - tag / class mapping to use (the general one defined by the TaggedClass by default)
 exclude fields
     - Annotated[T, not_exportable]
 Mappings with non string keys

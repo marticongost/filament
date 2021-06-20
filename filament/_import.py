@@ -15,7 +15,13 @@ from typing import (
     get_type_hints,
 )
 
-from ._exceptions import ImportTypeError, NoneRequiredError, ValueRequiredError
+from ._exceptions import (
+    ImportTypeError,
+    NoneRequiredError,
+    UnknownClassTagError,
+    ValueRequiredError,
+)
+from ._taggedclass import TaggedClass
 
 JSON = Union[None, str, bool, int, float, dict[str, Any], list]
 
@@ -108,14 +114,24 @@ def from_json(
             return target_type(from_json(v, type_args[0]) for v in value)  # type: ignore
 
     if isinstance(value, dict):
-        annotations = get_type_hints(target_type)
+        assert target_type is not None
+        cls = target_type
+        if issubclass(target_type, TaggedClass):
+            class_tag = value.get("class")
+            if class_tag:
+                try:
+                    cls = target_type.filament_tags[class_tag]  # type: ignore
+                except KeyError:
+                    raise UnknownClassTagError(target_type, class_tag)
+
+        annotations = get_type_hints(cls)
         if annotations:
-            return target_type(
-                **{
-                    field_name: from_json(value[field_name], field_type)
-                    for field_name, field_type in annotations.items()
-                }
-            )  # type: ignore
+            values = {
+                field_name: from_json(value[field_name], field_type)
+                for field_name, field_type in annotations.items()
+                if not field_name.startswith("filament_")
+            }
+            return cls(**values)  # type: ignore
 
     raise ImportTypeError(value, target_type)
 
