@@ -84,8 +84,6 @@ def to_json(value: Any, *, use_custom_exporter: bool = True) -> JSON:
         record = {}
         for k, v in value.items():
             k = to_json(k)
-            if not isinstance(k, str):
-                raise ValueError("JSON object keys must be strings")
             record[k] = to_json(v)
 
         return record
