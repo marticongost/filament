@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Any
+from typing import Annotated, Any
 from unittest.mock import patch
 
 import pytest
@@ -135,9 +135,22 @@ def test_can_override_export_protocol_on_str_subclasses():
     assert to_json(TestStr("yay")) == "yay!"
 
 
-def test_exports_object_with_attribute_annotations_as_dict():
+def test_exports_object_with_type_hints_as_dict():
     class TestObject:
         x: int
+        y: int
+
+    with patch("filament.to_json") as MockClass:
+        MockClass.side_effect = ToJsonCall
+        obj = TestObject()
+        obj.x = 1
+        obj.y = 2
+        assert to_json(obj) == {"x": ToJsonCall(1), "y": ToJsonCall(2)}
+
+
+def test_exports_object_with_annotated_type_hints_as_dict():
+    class TestObject:
+        x: Annotated[int, "foobar"]
         y: int
 
     with patch("filament.to_json") as MockClass:

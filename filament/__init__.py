@@ -4,7 +4,17 @@ from datetime import date, datetime, time
 from decimal import Decimal
 from enum import Enum
 from types import FunctionType
-from typing import Any, Collection, Mapping, Optional, Protocol, Type, TypeVar, Union
+from typing import (
+    Any,
+    Collection,
+    Mapping,
+    Optional,
+    Protocol,
+    Type,
+    TypeVar,
+    Union,
+    get_type_hints,
+)
 
 JSON = Union[None, str, bool, int, float, dict[str, Any], list]
 
@@ -92,7 +102,7 @@ def to_json(value: Any, *, use_custom_exporter: bool = True) -> JSON:
         return [to_json(v) for v in value]
 
     if not isinstance(value, FunctionType):
-        annotations = getattr(type(value), "__annotations__", None)
+        annotations = get_type_hints(type(value))
         if annotations:
             return {
                 field_name: to_json(getattr(value, field_name))
@@ -162,7 +172,7 @@ def from_json(
             return target_type(from_json(v, type_args[0]) for v in value)  # type: ignore
 
     if isinstance(value, dict):
-        annotations = getattr(target_type, "__annotations__", None)
+        annotations = get_type_hints(target_type)
         if annotations:
             return target_type(
                 **{
