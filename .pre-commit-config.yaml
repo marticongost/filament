@@ -1,0 +1,19 @@
+repos:
+  - repo: https://github.com/hadialqattan/pycln
+    rev: v0.0.2
+    hooks:
+      - id: pycln
+        args:
+          [
+            --all,
+            --exclude=(\.eggs|\.git|\.mypy_cache|__pycache__|__init__\.py),
+          ]
+  - repo: https://github.com/psf/black
+    rev: 21.6b0
+    hooks:
+      - id: black
+        language_version: python3
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: 3.9.2
+    hooks:
+      - id: flake8

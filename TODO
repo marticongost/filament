@@ -1,0 +1,27 @@
+missing keys when importing an object from a dictionary
+what happens if value and target_type don't match
+tests for use_custom_importer / exporter = False
+Support for Annotated hints
+classes without a full constructor
+    - try to support frozen dataclasses, not frozen dataclasses and regular classes with
+      no builder constructor
+protected / private fields
+simpler solution for classes with multiple subclasses:
+    - TaggedClass mixin, __init_subclass__ to create a subclass registry
+    - Use class name by default as an identifier, optional class initialization parameter
+      to override it
+    - Annotated[T, class_tag(...)] to optionally customize the serialization
+        - Key name for the class tag ("class" by default)
+        - Whether to add the class tag or not (True by default on TaggledClass references)
+        - tag / class mapping to use (the general one defined by the TaggedClass by default)
+exclude fields
+    - Annotated[T, not_exportable]
+Mappings with non string keys
+    - Export as list
+    - How should items be encoded?
+        - Two position list
+        - Object with keys for the key and value
+        - Configurable via Annotated?
+Parameters for custom importers/exporters (passed to to_json / from_json)
+Exporting subsets?
+mypy
