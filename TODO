@@ -23,4 +23,3 @@ Mappings with non string keys
         - Configurable via Annotated?
 Parameters for custom importers/exporters (passed to to_json / from_json)
 Exporting subsets?
-mypy
