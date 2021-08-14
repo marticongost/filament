@@ -1,5 +1,7 @@
 # nopycln: file
 
+from ._choices import Choices, InvalidChoiceError
+from ._constraint import Constraint, ConstraintError
 from ._exceptions import (
     ExportTypeError,
     ImportTypeError,
@@ -9,4 +11,5 @@ from ._exceptions import (
 )
 from ._export import CustomJSONExporter, dumps, to_json
 from ._import import CustomJSONImporter, from_json, loads
+from ._importpath import ImportPath
 from ._taggedclass import TaggedClass
