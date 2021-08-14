@@ -1,5 +1,7 @@
 # nopycln: file
 
+__version__ = "0.0.2"
+
 from ._choices import Choices, InvalidChoiceError
 from ._constraint import Constraint, ConstraintError
 from ._exceptions import (

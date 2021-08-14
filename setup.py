@@ -6,7 +6,7 @@ DIR = Path(__file__).parent
 
 setup(
     name="filament",
-    version="0.0.1",
+    version="0.0.2",
     description="Serialization of python objects to/from JSON.",
     long_description=(DIR / "README.md").read_text(),
     long_description_content_type="text/markdown",
