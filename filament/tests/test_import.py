@@ -304,7 +304,9 @@ def test_raises_error_when_importing_an_unsupported_type():
 
 def test_can_import_unions():
     assert from_json(5, Union[int, str]) == 5
+    assert from_json(5, Union[str, int]) == "5"
     assert from_json("5", Union[int, str]) == 5
+    assert from_json("5", Union[str, int]) == "5"
     assert from_json("5.3", Union[int, float, str]) == 5.3
     assert from_json("5.3", Union[int, str, float]) == "5.3"
     assert from_json("foobar", Union[int, str]) == "foobar"
